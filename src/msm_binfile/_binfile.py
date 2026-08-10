@@ -63,6 +63,9 @@ class BinFile:
 	def read_uint32(self, align: bool = True) -> int:
 		return unpack('I', self.read(4, align))[0]
 
+	def read_uint64(self, align: bool = True) -> int:
+		return unpack('L', self.read(8, align))[0]
+
 	def read_int8(self, align: bool = True) -> int:
 		return unpack('b', self.read(1, align))[0]
 
@@ -72,8 +75,14 @@ class BinFile:
 	def read_int32(self, align: bool = True) -> int:
 		return unpack('i', self.read(4, align))[0]
 
+	def read_int64(self, align: bool = True) -> int:
+		return unpack('l', self.read(8, align))[0]
+
 	def read_float(self, align: bool = True) -> float:
 		return unpack('f', self.read(4, align))[0]
+
+	def read_double(self, align: bool = True) -> int:
+		return unpack('d', self.read(8, align))[0]
 
 	def read_string(self) -> str:
 		string_len: int = self.read_uint32() - 1
