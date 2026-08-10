@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools >= 80.9.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "msm-binfile"
+version = "1.0.0"
+authors = [
+  { name="iestyn129", email="iestyn129msm@gmail.com" },
+]
+description = "A simple library for reading/writing to My Singing Monsters' binary files."
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "GPL-3.0-only"
+license-files = ["LICEN[CS]E*"]
+
+[project.urls]
+Homepage = "https://github.com/iestyn129/msm-binfile"
+Issues = "https://github.com/iestyn129/msm-binfile/issues"
