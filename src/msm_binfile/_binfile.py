@@ -39,13 +39,13 @@ class BinFile:
 	def seek(self, offset: int, whence: int = 0) -> int:
 		return self.__fp.seek(offset, whence)
 
-	def read(self, size: int, align: bool = True) -> bytes:
+	def read(self, size: int, align: bool) -> bytes:
 		if align:
 			self.__align(size)
 
 		return self.__fp.read(size)
 
-	def write(self, data: bytes, align: bool = True) -> int:
+	def write(self, data: bytes, align: bool) -> int:
 		if not self.__fp.writable():
 			raise IOError(f'{self.__filename} is not writable')
 
@@ -54,26 +54,26 @@ class BinFile:
 
 		return self.__fp.write(data)
 
-	def read_uint8(self) -> int:
-		return unpack('B', self.read(1))[0]
+	def read_uint8(self, align: bool = True) -> int:
+		return unpack('B', self.read(1, align))[0]
 
-	def read_uint16(self) -> int:
-		return unpack('H', self.read(2))[0]
+	def read_uint16(self, align: bool = True) -> int:
+		return unpack('H', self.read(2, align))[0]
 
-	def read_uint32(self) -> int:
-		return unpack('I', self.read(4))[0]
+	def read_uint32(self, align: bool = True) -> int:
+		return unpack('I', self.read(4, align))[0]
 
-	def read_int8(self) -> int:
-		return unpack('b', self.read(1))[0]
+	def read_int8(self, align: bool = True) -> int:
+		return unpack('b', self.read(1, align))[0]
 
-	def read_int16(self) -> int:
-		return unpack('h', self.read(2))[0]
+	def read_int16(self, align: bool = True) -> int:
+		return unpack('h', self.read(2, align))[0]
 
-	def read_int32(self) -> int:
-		return unpack('i', self.read(4))[0]
+	def read_int32(self, align: bool = True) -> int:
+		return unpack('i', self.read(4, align))[0]
 
-	def read_float(self) -> float:
-		return unpack('f', self.read(4))[0]
+	def read_float(self, align: bool = True) -> float:
+		return unpack('f', self.read(4, align))[0]
 
 	def read_string(self) -> str:
 		string_len: int = self.read_uint32() - 1
@@ -81,26 +81,26 @@ class BinFile:
 		self.__string_align(string)
 		return string
 
-	def write_uint8(self, val: int) -> int:
-		return self.write(pack('B', val))
+	def write_uint8(self, val: int, align: bool = True) -> int:
+		return self.write(pack('B', val), align)
 
-	def write_uint16(self, val: int) -> int:
-		return self.write(pack('H', val))
+	def write_uint16(self, val: int, align: bool = True) -> int:
+		return self.write(pack('H', val), align)
 
-	def write_uint32(self, val: int) -> int:
-		return self.write(pack('I', val))
+	def write_uint32(self, val: int, align: bool = True) -> int:
+		return self.write(pack('I', val), align)
 
-	def write_int8(self, val: int) -> int:
-		return self.write(pack('b', val))
+	def write_int8(self, val: int, align: bool = True) -> int:
+		return self.write(pack('b', val), align)
 
-	def write_int16(self, val: int) -> int:
-		return self.write(pack('h', val))
+	def write_int16(self, val: int, align: bool = True) -> int:
+		return self.write(pack('h', val), align)
 
-	def write_int32(self, val: int) -> int:
-		return self.write(pack('i', val))
+	def write_int32(self, val: int, align: bool = True) -> int:
+		return self.write(pack('i', val), align)
 
-	def write_float(self, val: float) -> int:
-		return self.write(pack('f', val))
+	def write_float(self, val: float, align: bool = True) -> int:
+		return self.write(pack('f', val), align)
 
 	def write_string(self, val: str) -> int:
 		self.write_uint32(len(val) + 1)

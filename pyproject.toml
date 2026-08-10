@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools >= 80.9.0"]
+requires = ["setuptools >= 84.0.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "msm-binfile"
-version = "1.0.0"
+version = "1.0.1"
 authors = [
   { name="iestyn129", email="iestyn129msm@gmail.com" },
 ]
