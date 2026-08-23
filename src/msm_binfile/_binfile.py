@@ -1,20 +1,25 @@
 from os import PathLike, path
 from struct import pack, unpack
-from typing import Any, IO, Self
+from typing import TYPE_CHECKING, Any, IO, Self, TypeVar
 import os
+
+if TYPE_CHECKING:
+	from ._binserialisable import BinSerializable
 
 __all__: list[str] = ['BinFile']
 
 
+T = TypeVar('T', bound=BinSerializable)
 class BinFile:
 	__CHUNK_SIZE: int = 4
 
-	def __init__(self, filename: PathLike | str, mode: str = 'rb') -> None:
+	def __init__(self, filename: PathLike[str], mode: str = 'rb') -> None:
 		if 'b' not in mode:
 			mode += 'b'
 
-		self.__fp: IO = open(filename, mode)
-		self.__filename: PathLike | str = path.split(filename)[1]
+		filename = os.fspath(filename)
+		self.__fp: IO[bytes] = open(filename, mode)
+		self.__filename: str = path.basename(filename)
 
 	def __enter__(self) -> Self:
 		return self
@@ -55,64 +60,83 @@ class BinFile:
 		return self.__fp.write(data)
 
 	def read_uint8(self, align: bool = True) -> int:
-		return unpack('B', self.read(1, align))[0]
+		return unpack('<B', self.read(1, align))[0]
 
 	def read_uint16(self, align: bool = True) -> int:
-		return unpack('H', self.read(2, align))[0]
+		return unpack('<H', self.read(2, align))[0]
 
 	def read_uint32(self, align: bool = True) -> int:
-		return unpack('I', self.read(4, align))[0]
+		return unpack('<I', self.read(4, align))[0]
 
 	def read_uint64(self, align: bool = True) -> int:
-		return unpack('L', self.read(8, align))[0]
+		return unpack('<Q', self.read(8, align))[0]
 
 	def read_int8(self, align: bool = True) -> int:
-		return unpack('b', self.read(1, align))[0]
+		return unpack('<b', self.read(1, align))[0]
 
 	def read_int16(self, align: bool = True) -> int:
-		return unpack('h', self.read(2, align))[0]
+		return unpack('<h', self.read(2, align))[0]
 
 	def read_int32(self, align: bool = True) -> int:
-		return unpack('i', self.read(4, align))[0]
+		return unpack('<i', self.read(4, align))[0]
 
 	def read_int64(self, align: bool = True) -> int:
-		return unpack('l', self.read(8, align))[0]
+		return unpack('<q', self.read(8, align))[0]
 
 	def read_float(self, align: bool = True) -> float:
-		return unpack('f', self.read(4, align))[0]
+		return unpack('<f', self.read(4, align))[0]
 
-	def read_double(self, align: bool = True) -> int:
-		return unpack('d', self.read(8, align))[0]
+	def read_double(self, align: bool = True) -> float:
+		return unpack('<d', self.read(8, align))[0]
 
 	def read_string(self) -> str:
 		string_len: int = self.read_uint32() - 1
+
+		if string_len < 0:
+			raise ValueError(f'{self.__filename} has an invalid string length at 0x{self.tell()-4:x}')
+
 		string: str = self.read(string_len, False).decode('ascii')
 		self.__string_align(string)
 		return string
 
+	def read_serializable(self, cls: type[T]) -> T:
+		return cls.read(self)
+
 	def write_uint8(self, val: int, align: bool = True) -> int:
-		return self.write(pack('B', val), align)
+		return self.write(pack('<B', val), align)
 
 	def write_uint16(self, val: int, align: bool = True) -> int:
-		return self.write(pack('H', val), align)
+		return self.write(pack('<H', val), align)
 
 	def write_uint32(self, val: int, align: bool = True) -> int:
-		return self.write(pack('I', val), align)
+		return self.write(pack('<I', val), align)
+
+	def write_uint64(self, val: int, align: bool = True) -> int:
+		return self.write(pack('<Q', val), align)
 
 	def write_int8(self, val: int, align: bool = True) -> int:
-		return self.write(pack('b', val), align)
+		return self.write(pack('<b', val), align)
 
 	def write_int16(self, val: int, align: bool = True) -> int:
-		return self.write(pack('h', val), align)
+		return self.write(pack('<h', val), align)
 
 	def write_int32(self, val: int, align: bool = True) -> int:
-		return self.write(pack('i', val), align)
+		return self.write(pack('<i', val), align)
+
+	def write_int64(self, val: int, align: bool = True) -> int:
+		return self.write(pack('<q', val), align)
 
 	def write_float(self, val: float, align: bool = True) -> int:
-		return self.write(pack('f', val), align)
+		return self.write(pack('<f', val), align)
+
+	def write_double(self, val: float, align: bool = True) -> int:
+		return self.write(pack('<d', val), align)
 
 	def write_string(self, val: str) -> int:
 		self.write_uint32(len(val) + 1)
 		written: int = self.write(val.encode('ascii'), False)
 		self.__string_align(val)
 		return written
+
+	def write_serializable(self, serializable: T) -> None:
+		serializable.write(self)
