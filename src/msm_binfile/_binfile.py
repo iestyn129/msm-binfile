@@ -1,6 +1,6 @@
 from os import PathLike, path
 from struct import pack, unpack
-from typing import TYPE_CHECKING, Any, IO, Self, TypeVar
+from typing import TYPE_CHECKING, Any, AnyStr, IO, Self, TypeVar
 import os
 
 if TYPE_CHECKING:
@@ -13,7 +13,7 @@ T = TypeVar('T', bound=BinSerializable)
 class BinFile:
 	__CHUNK_SIZE: int = 4
 
-	def __init__(self, filename: PathLike[str], mode: str = 'rb') -> None:
+	def __init__(self, filename: PathLike[AnyStr] | str, mode: str = 'rb') -> None:
 		if 'b' not in mode:
 			mode += 'b'
 
