@@ -1,10 +1,8 @@
+from ._binserialisable import BinSerializable
 from os import PathLike, path
 from struct import pack, unpack
 from typing import TYPE_CHECKING, Any, AnyStr, IO, Self, TypeVar
 import os
-
-if TYPE_CHECKING:
-	from ._binserialisable import BinSerializable
 
 __all__: list[str] = ['BinFile']
 
