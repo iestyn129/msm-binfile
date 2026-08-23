@@ -2,7 +2,9 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING, Self
 
 if TYPE_CHECKING:
-    from ._binfile import BinFile
+	from ._binfile import BinFile
+else:
+	BinFile = object
 
 __all__: list[str] = ['BinSerializable']
 
